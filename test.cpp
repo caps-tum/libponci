@@ -15,21 +15,19 @@
 #include <thread>
 #include <string>
 
-#include <unistd.h>
-
 #include "ponci.hpp"
 
 static void sleeper(const std::string name) {
-	cgroup_create(name.c_str());
+	cgroup_create(name);
 	size_t arr[] = {0};
 
-	cgroup_set_cpus(name.c_str(), arr, 1);
-	cgroup_set_mems(name.c_str(), arr, 1);
-	cgroup_add_me(name.c_str());
+	cgroup_set_cpus(name, arr, 1);
+	cgroup_set_mems(name, arr, 1);
+	cgroup_add_me(name);
 
 	std::cout << "Going to freeze me. brrrr" << std::endl;
 	std::cout << "Please press return to thaw me." << std::endl;
-	cgroup_freeze(name.c_str());
+	cgroup_freeze(name);
 
 	std::cout << "Aaaah, its warm again!" << std::endl;
 }
@@ -37,30 +35,30 @@ static void sleeper(const std::string name) {
 int main(int argc, char const *argv[]) {
 	const std::string name("ponci_test1");
 
-	cgroup_create(name.c_str());
+	cgroup_create(name);
 
 	size_t arr[] = {0, 2, 3};
 
-	cgroup_set_cpus(name.c_str(), arr, 3);
-	cgroup_set_mems(name.c_str(), arr, 1);
-	cgroup_add_me(name.c_str());
+	cgroup_set_cpus(name, arr, 3);
+	cgroup_set_mems(name, arr, 1);
+	cgroup_add_me(name);
 
-	cgroup_set_memory_migrate(name.c_str(), 1);
-	cgroup_set_cpus_exclusive(name.c_str(), 1);
-	cgroup_set_mem_hardwall(name.c_str(), 1);
-	cgroup_set_scheduling_domain(name.c_str(), -1);
+	cgroup_set_memory_migrate(name, 1);
+	cgroup_set_cpus_exclusive(name, 1);
+	cgroup_set_mem_hardwall(name, 1);
+	cgroup_set_scheduling_domain(name, -1);
 
 	std::string sleeper_name = name + std::string("/ponci_sleeper");
 	std::thread t_freeze(sleeper, sleeper_name);
 
-	// wait for user input
+	// wait for return from keyboard
 	std::cin.ignore();
 
-	cgroup_thaw(sleeper_name.c_str());
+	cgroup_thaw(sleeper_name);
 
 	t_freeze.join();
 
-	cgroup_delete(sleeper_name.c_str());
+	cgroup_delete(sleeper_name);
 
 	return 0;
 }
