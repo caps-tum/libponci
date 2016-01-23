@@ -48,7 +48,7 @@ int main(int argc, char const *argv[]) {
 	cgroup_set_mem_hardwall(name, 1);
 	cgroup_set_scheduling_domain(name, -1);
 
-	std::string sleeper_name = name + std::string("/ponci_sleeper");
+	const std::string sleeper_name = name + std::string("/ponci_sleeper");
 	std::thread t_freeze(sleeper, sleeper_name);
 
 	// wait for return from keyboard
