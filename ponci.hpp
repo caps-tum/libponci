@@ -42,6 +42,7 @@ inline void cgroup_set_cpus(const std::string &name, const size_t *cpus, size_t 
 }
 
 inline void cgroup_set_cpus(const std::string &name, const std::vector<size_t> &cpus) {
+
 	cgroup_set_cpus(name.c_str(), &cpus[0], cpus.size());
 }
 

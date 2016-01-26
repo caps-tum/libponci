@@ -12,8 +12,8 @@
  */
 
 #include <iostream>
-#include <thread>
 #include <string>
+#include <thread>
 
 #include "ponci.hpp"
 
@@ -33,7 +33,7 @@ static void sleeper(const std::string name) {
 }
 
 int main(int argc, char const *argv[]) {
-	const std::string name("ponci_test1");
+	const std::string name("ponci_test");
 
 	cgroup_create(name);
 
@@ -59,6 +59,10 @@ int main(int argc, char const *argv[]) {
 	t_freeze.join();
 
 	cgroup_delete(sleeper_name);
+
+	// remove me from cgroup name and add me to the root before deleting the cgroup
+	cgroup_add_me("");
+	cgroup_delete(name);
 
 	return 0;
 }
