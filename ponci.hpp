@@ -27,6 +27,7 @@ extern "C" {
 } /* end extern "C" */
 
 #include <string>
+#include <vector>
 
 inline void cgroup_create(const std::string &name) { cgroup_create(name.c_str()); }
 
@@ -36,12 +37,20 @@ inline void cgroup_add_me(const std::string &name) { cgroup_add_me(name.c_str())
 
 inline void cgroup_add_task(const std::string &name, const pid_t pid) { cgroup_add_task(name.c_str(), pid); }
 
-inline void cgroup_set_cpus(const std::string &name, size_t *cpus, size_t size) {
+inline void cgroup_set_cpus(const std::string &name, const size_t *cpus, size_t size) {
 	cgroup_set_cpus(name.c_str(), cpus, size);
 }
 
-inline void cgroup_set_mems(const std::string &name, size_t *mems, size_t size) {
+inline void cgroup_set_cpus(const std::string &name, const std::vector<size_t> &cpus) {
+	cgroup_set_cpus(name.c_str(), &cpus[0], cpus.size());
+}
+
+inline void cgroup_set_mems(const std::string &name, const size_t *mems, size_t size) {
 	cgroup_set_mems(name.c_str(), mems, size);
+}
+
+inline void cgroup_set_mems(const std::string &name, const std::vector<size_t> &mems) {
+	cgroup_set_mems(name.c_str(), &mems[0], mems.size());
 }
 
 inline void cgroup_set_memory_migrate(const std::string &name, size_t flag) {

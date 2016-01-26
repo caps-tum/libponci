@@ -39,13 +39,13 @@ void cgroup_add_task(const char *name, const pid_t pid);
  * Allows the @p cpus to be used in the cgroup @p name. @p size is the
  * length of the array @p cpus.
  */
-void cgroup_set_cpus(const char *name, size_t *cpus, size_t size);
+void cgroup_set_cpus(const char *name, const size_t *cpus, size_t size);
 
 /**
  * Allows the memory modules @p mems to be used in the cgroup @p name.
  * @p size is the length of the array @p mems.
  */
-void cgroup_set_mems(const char *name, size_t *mems, size_t size);
+void cgroup_set_mems(const char *name, const size_t *mems, size_t size);
 
 /**
  * Change the memory migrate option for cgroup @p name.

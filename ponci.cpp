@@ -11,19 +11,19 @@
 
 #include "ponci.hpp"
 
-#include <string>
-#include <stdexcept>
 #include <fstream>
-#include <sstream>
 #include <iostream>
+#include <sstream>
+#include <stdexcept>
+#include <string>
 
-#include <cstring>
 #include <cassert>
+#include <cstring>
 
-#include <sys/stat.h>
-#include <unistd.h>
-#include <sys/syscall.h>
 #include <errno.h>
+#include <sys/stat.h>
+#include <sys/syscall.h>
+#include <unistd.h>
 
 // TODO function to change prefix
 
@@ -67,14 +67,14 @@ void cgroup_add_task(const char *name, const pid_t tid) {
 	check_value_in_file(filename, tid);
 }
 
-void cgroup_set_cpus(const char *name, size_t *cpus, size_t size) {
+void cgroup_set_cpus(const char *name, const size_t *cpus, size_t size) {
 	std::string filename = cgroup_path(name) + std::string("cpuset.cpus");
 
 	write_array_to_file(filename, cpus, size);
 	// TODO add check. The current check function does not understand the output
 }
 
-void cgroup_set_mems(const char *name, size_t *mems, size_t size) {
+void cgroup_set_mems(const char *name, const size_t *mems, size_t size) {
 	std::string filename = cgroup_path(name) + std::string("cpuset.mems");
 
 	write_array_to_file(filename, mems, size);
