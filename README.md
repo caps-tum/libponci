@@ -1,5 +1,4 @@
-# libponci
-poor mans cgroup interface
+# libponci -- poor mans cgroup interface
 
 [![Build Status](https://travis-ci.org/lrr-tum/libponci.svg?branch=master)](https://travis-ci.org/lrr-tum/libponci)
 
