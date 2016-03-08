@@ -41,6 +41,7 @@ matrix:
       env: COMPILER=clang++-3.7
 
 before_install:
+  - sudo add-apt-repository -y ppa:george-edison55/precise-backports
   - sudo apt-get update -qq
 script:
   - mkdir build
