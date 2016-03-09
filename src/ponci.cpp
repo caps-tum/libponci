@@ -9,7 +9,7 @@
  * Some rights reserved. See LICENSE
  */
 
-#include "ponci.hpp"
+#include "ponci/ponci.hpp"
 
 #include <fstream>
 #include <iostream>

@@ -15,7 +15,7 @@
 #include <string>
 #include <thread>
 
-#include "ponci.hpp"
+#include "ponci/ponci.hpp"
 
 static void sleeper(const std::string name) {
 	cgroup_create(name);
