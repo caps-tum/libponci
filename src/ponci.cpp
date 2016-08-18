@@ -33,8 +33,6 @@
 // default mount path
 static std::string path_prefix("/sys/fs/cgroup/");
 
-// TODO function to change prefix?
-
 /////////////////////////////////////////////////////////////////
 // PROTOTYPES
 /////////////////////////////////////////////////////////////////
@@ -196,6 +194,10 @@ void cgroup_kill(const char *name) {
 /////////////////////////////////////////////////////////////////
 
 static inline std::string cgroup_path(const char *name) {
+	const char *env = std::getenv("PONCI_PATH");
+	if (env != nullptr) {
+		path_prefix = std::string(env);
+	}
 	std::string res(path_prefix);
 	if (strcmp(name, "") != 0) {
 		res.append(name);
