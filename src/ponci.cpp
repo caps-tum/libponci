@@ -19,12 +19,12 @@
 #include <string>
 
 #include <cassert>
+#include <cerrno>
+#include <csignal>
 #include <cstdio>
 #include <cstring>
 
 #include <dirent.h>
-#include <errno.h>
-#include <signal.h>
 #include <sys/stat.h>
 #include <sys/syscall.h>
 #include <sys/types.h>
@@ -69,7 +69,7 @@ void cgroup_delete(const char *name) {
 	if (err != 0) throw std::runtime_error(strerror(errno));
 }
 void cgroup_add_me(const char *name) {
-	pid_t me = static_cast<pid_t>(syscall(SYS_gettid));
+	auto me = static_cast<pid_t>(syscall(SYS_gettid));
 	cgroup_add_task(name, me);
 }
 

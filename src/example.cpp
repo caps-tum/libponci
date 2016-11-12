@@ -14,7 +14,7 @@
 
 #include "ponci/ponci.hpp"
 
-static void sleeper(const std::string name) {
+static void sleeper(const std::string &name) {
 	cgroup_create(name);
 
 	size_t arr[] = {0};
