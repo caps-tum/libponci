@@ -31,7 +31,7 @@
 #include <unistd.h>
 
 // size of the buffers used to read from file
-static constexpr std::size_t buf_size = buf_size;
+static constexpr std::size_t buf_size = 255;
 
 // default mount path
 static std::string path_prefix("/sys/fs/cgroup/");
@@ -285,6 +285,8 @@ static inline std::string read_line_from_file(const std::string &filename) {
 
 	char temp[buf_size];
 	if (fgets(temp, buf_size, file) == nullptr && (feof(file) == 0)) {
+		// something is wrong. let's try to close the file and go home
+		fclose(file);
 		throw std::runtime_error("Error while reading file in libponci. Buffer to small?");
 	}
 
@@ -313,6 +315,8 @@ template <typename T> static inline std::vector<T> read_lines_from_file(const st
 	char temp[buf_size];
 	while (true) {
 		if (fgets(temp, buf_size, file) == nullptr && !feof(file)) {
+			// something is wrong. let's try to close the file and go home
+			fclose(file);
 			throw std::runtime_error("Error while reading file in libponci. Buffer to small?");
 		}
 		if (feof(file)) break;

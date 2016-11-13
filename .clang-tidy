@@ -1,4 +1,4 @@
-Checks:          'clang-diagnostic-*,clang-analyzer-*,modernize*,performance*,misc*,readability*'
+Checks:          'clang-diagnostic-*,clang-analyzer-*,modernize*,performance*,misc*,readability*,unix*'
 WarningsAsErrors: ''
 HeaderFilterRegex: ''
 AnalyzeTemporaryDtors: false

@@ -94,4 +94,4 @@ script:
   - make
   - make install
   - cd ..
-  - if [ -n "$RUNCLANGTIDY" ]; then git ls-files '*.cpp' | xargs -P 1 -I{} clang-tidy -p build {}; fi
+  - if [ -n "$RUNCLANGTIDY" ]; then git ls-files '*.cpp' | xargs -P 1 -I{} clang-tidy -header-filter=.* -p build {}; fi
