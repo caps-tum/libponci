@@ -30,6 +30,9 @@
 #include <sys/types.h>
 #include <unistd.h>
 
+// size of the buffers used to read from file
+static constexpr std::size_t buf_size = buf_size;
+
 // default mount path
 static std::string path_prefix("/sys/fs/cgroup/");
 
@@ -51,7 +54,7 @@ template <typename T> static inline T string_to_T(const std::string &s, std::siz
 // template <> inline unsigned long string_to_T<unsigned long>(const std::string &s, std::size_t &done);
 template <> inline int string_to_T<int>(const std::string &s, std::size_t &done);
 
-static std::vector<int> get_tids_from_pid(const int pid);
+static std::vector<int> get_tids_from_pid(int pid);
 
 /////////////////////////////////////////////////////////////////
 // EXPORTED FUNCTIONS
@@ -182,7 +185,7 @@ void cgroup_kill(const char *name) {
 	}
 
 	// wait until tasks empty
-	while (pids.size() != 0) {
+	while (!pids.empty()) {
 		pids = read_lines_from_file<int>(cgroup_path(name) + std::string("tasks"));
 	}
 
@@ -233,7 +236,11 @@ template <typename T> static inline void append_value_to_file(const std::string 
 	std::string str = std::to_string(val);
 
 	if (fputs(str.c_str(), f) == EOF && ferror(f) != 0) {
-		throw std::runtime_error(strerror(errno));
+		// try to close the file, but return the old error
+		auto err = errno;
+		fclose(f);
+
+		throw std::runtime_error(strerror(err));
 	}
 	if (fclose(f) != 0) {
 		throw std::runtime_error(strerror(errno));
@@ -255,7 +262,11 @@ template <> void write_value_to_file<const char *>(const std::string &filename, 
 
 	int status = fputs(val, file);
 	if (status <= 0 || ferror(file) != 0) {
-		throw std::runtime_error(strerror(errno));
+		// try to close the file, but return the old error
+		auto err = errno;
+		fclose(file);
+
+		throw std::runtime_error(strerror(err));
 	}
 
 	if (fclose(file) != 0) {
@@ -272,12 +283,14 @@ static inline std::string read_line_from_file(const std::string &filename) {
 		throw std::runtime_error(strerror(errno));
 	}
 
-	char temp[255];
-	if (fgets(temp, 255, file) == nullptr && !feof(file)) {
+	char temp[buf_size];
+	if (fgets(temp, buf_size, file) == nullptr && (feof(file) == 0)) {
 		throw std::runtime_error("Error while reading file in libponci. Buffer to small?");
 	}
 
-	if (feof(file)) return std::string();
+	if (feof(file) != 0) {
+		memset(temp, 0, buf_size);
+	}
 
 	if (fclose(file) != 0) {
 		throw std::runtime_error(strerror(errno));
@@ -297,9 +310,9 @@ template <typename T> static inline std::vector<T> read_lines_from_file(const st
 
 	std::vector<T> ret;
 
-	char temp[255];
+	char temp[buf_size];
 	while (true) {
-		if (fgets(temp, 255, file) == nullptr && !feof(file)) {
+		if (fgets(temp, buf_size, file) == nullptr && !feof(file)) {
 			throw std::runtime_error("Error while reading file in libponci. Buffer to small?");
 		}
 		if (feof(file)) break;
