@@ -33,8 +33,8 @@
 // size of the buffers used to read from file
 static constexpr std::size_t buf_size = 255;
 
-// default mount path
-static std::string path_prefix("/sys/fs/cgroup/");
+// default mount path ... fancy construct to prevent exit-time destructor from being called
+static std::string &path_prefix = *new std::string("/sys/fs/cgroup/");
 
 /////////////////////////////////////////////////////////////////
 // PROTOTYPES
