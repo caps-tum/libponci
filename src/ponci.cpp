@@ -238,7 +238,7 @@ void cgroup_kill(const char *name) {
 	// send kill
 	for (__pid_t pid : pids) {
 		if (std::find(tids.begin(), tids.end(), pid) != tids.end()) {
-			// pid in tids
+			// pid in tids -> we should not kill ourself :)
 		} else {
 			// pid not in tids
 			if (kill(pid, SIGTERM) != 0) {
