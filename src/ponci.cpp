@@ -35,9 +35,6 @@
 // size of the buffers used to read from file
 static constexpr std::size_t buf_size = 255;
 
-// default mount path ... fancy construct to prevent exit-time destructor from being called
-static auto &path_prefix = *new std::string("/sys/fs/cgroup/");
-
 #ifdef SYSTEMD_SUPPORT
 // list of all subsystems used ... again fancy construct to prevent exit-time destructor from being called
 static auto &subsystems = *new std::array<std::string, 2>{{"cpuset", "freezer"}};
@@ -236,7 +233,7 @@ void cgroup_kill(const char *name) {
 	replace_subsystem_in_path(cgp, "cpuset");
 
 	// get all pids
-	std::vector<int> pids = read_lines_from_file<int>(cgp + std::string("tasks"));
+	std::vector<__pid_t> pids = read_lines_from_file<__pid_t>(cgp + std::string("tasks"));
 
 	// send kill
 	for (__pid_t pid : pids) {
@@ -263,8 +260,9 @@ void cgroup_kill(const char *name) {
 /////////////////////////////////////////////////////////////////
 
 static inline std::string cgroup_path(const char *name) {
-	const char *env = std::getenv("PONCI_PATH");
-	std::string res(env != nullptr ? std::string(env) : path_prefix);
+	static const char *env = std::getenv("PONCI_PATH");
+
+	std::string res(env != nullptr ? std::string(env) : std::string("/sys/fs/cgroup/"));
 
 #ifdef SYSTEMD_SUPPORT
 	res.append(SUBSYSTEM_PLACEHOLDER);
