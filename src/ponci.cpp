@@ -70,7 +70,7 @@ template <> inline int string_to_T<int>(const std::string &s, std::size_t &done)
 
 static std::vector<int> get_tids_from_pid(int pid);
 
-static void replace_in_string(std::string &str, const std::string &to);
+static void replace_subsystem_in_path(std::string &str, const std::string &to);
 
 /////////////////////////////////////////////////////////////////
 // EXPORTED FUNCTIONS
@@ -79,7 +79,7 @@ void cgroup_create(const char *name) {
 	const auto cgp = cgroup_path(name);
 	for (const auto &sub : subsystems) {
 		auto temp = cgp;
-		replace_in_string(temp, sub);
+		replace_subsystem_in_path(temp, sub);
 		const int err = mkdir(temp.c_str(), S_IRWXU | S_IRWXG);
 
 		if (err != 0 && errno != EEXIST) throw std::runtime_error(strerror(errno));
@@ -92,7 +92,7 @@ void cgroup_delete(const char *name) {
 	const auto cgp = cgroup_path(name);
 	for (const auto &sub : subsystems) {
 		auto temp = cgp;
-		replace_in_string(temp, sub);
+		replace_subsystem_in_path(temp, sub);
 		const int err = rmdir(temp.c_str());
 
 		if (err != 0) throw std::runtime_error(strerror(errno));
@@ -108,7 +108,7 @@ void cgroup_add_task(const char *name, const pid_t tid) {
 	const auto cgp = cgroup_path(name);
 	for (const auto &sub : subsystems) {
 		auto temp = cgp;
-		replace_in_string(temp, sub);
+		replace_subsystem_in_path(temp, sub);
 
 		temp += std::string("tasks");
 		append_value_to_file(temp, tid);
@@ -117,7 +117,7 @@ void cgroup_add_task(const char *name, const pid_t tid) {
 
 void cgroup_set_cpus(const char *name, const size_t *cpus, size_t size) {
 	auto cgp = cgroup_path(name);
-	replace_in_string(cgp, "cpuset");
+	replace_subsystem_in_path(cgp, "cpuset");
 	std::string filename = cgp + std::string("cpuset.cpus");
 
 	write_array_to_file(filename, cpus, size);
@@ -125,7 +125,7 @@ void cgroup_set_cpus(const char *name, const size_t *cpus, size_t size) {
 
 void cgroup_set_cpus(const std::string &name, const std::vector<unsigned char> &cpus) {
 	auto cgp = cgroup_path(name.c_str());
-	replace_in_string(cgp, "cpuset");
+	replace_subsystem_in_path(cgp, "cpuset");
 	std::string filename = cgp + std::string("cpuset.cpus");
 
 	write_vector_to_file(filename, cpus);
@@ -133,7 +133,7 @@ void cgroup_set_cpus(const std::string &name, const std::vector<unsigned char> &
 
 void cgroup_set_mems(const char *name, const size_t *mems, size_t size) {
 	auto cgp = cgroup_path(name);
-	replace_in_string(cgp, "cpuset");
+	replace_subsystem_in_path(cgp, "cpuset");
 	std::string filename = cgp + std::string("cpuset.mems");
 
 	write_array_to_file(filename, mems, size);
@@ -141,7 +141,7 @@ void cgroup_set_mems(const char *name, const size_t *mems, size_t size) {
 
 void cgroup_set_mems(const std::string &name, const std::vector<unsigned char> &mems) {
 	auto cgp = cgroup_path(name.c_str());
-	replace_in_string(cgp, "cpuset");
+	replace_subsystem_in_path(cgp, "cpuset");
 	std::string filename = cgp + std::string("cpuset.mems");
 
 	write_vector_to_file(filename, mems);
@@ -151,7 +151,7 @@ void cgroup_set_memory_migrate(const char *name, size_t flag) {
 	assert(flag == 0 || flag == 1);
 
 	auto cgp = cgroup_path(name);
-	replace_in_string(cgp, "cpuset");
+	replace_subsystem_in_path(cgp, "cpuset");
 	std::string filename = cgp + std::string("cpuset.memory_migrate");
 
 	write_value_to_file(filename, flag);
@@ -161,7 +161,7 @@ void cgroup_set_cpus_exclusive(const char *name, size_t flag) {
 	assert(flag == 0 || flag == 1);
 
 	auto cgp = cgroup_path(name);
-	replace_in_string(cgp, "cpuset");
+	replace_subsystem_in_path(cgp, "cpuset");
 	std::string filename = cgp + std::string("cpuset.cpu_exclusive");
 
 	write_value_to_file(filename, flag);
@@ -170,7 +170,7 @@ void cgroup_set_cpus_exclusive(const char *name, size_t flag) {
 void cgroup_set_mem_hardwall(const char *name, size_t flag) {
 	assert(flag == 0 || flag == 1);
 	auto cgp = cgroup_path(name);
-	replace_in_string(cgp, "cpuset");
+	replace_subsystem_in_path(cgp, "cpuset");
 	std::string filename = cgp + std::string("cpuset.mem_hardwall");
 
 	write_value_to_file(filename, flag);
@@ -179,7 +179,7 @@ void cgroup_set_mem_hardwall(const char *name, size_t flag) {
 void cgroup_set_scheduling_domain(const char *name, int flag) {
 	assert(flag >= -1 && flag <= 5);
 	auto cgp = cgroup_path(name);
-	replace_in_string(cgp, "cpuset");
+	replace_subsystem_in_path(cgp, "cpuset");
 	std::string filename = cgp + std::string("cpuset.sched_relax_domain_level");
 
 	write_value_to_file(filename, flag);
@@ -190,7 +190,7 @@ void cgroup_freeze(const char *name) {
 	assert(strcmp(name, "") != 0);
 
 	auto cgp = cgroup_path(name);
-	replace_in_string(cgp, "freezer");
+	replace_subsystem_in_path(cgp, "freezer");
 	std::string filename = cgp + std::string("freezer.state");
 
 	write_value_to_file(filename, "FROZEN");
@@ -198,7 +198,7 @@ void cgroup_freeze(const char *name) {
 
 void cgroup_thaw(const char *name) {
 	auto cgp = cgroup_path(name);
-	replace_in_string(cgp, "freezer");
+	replace_subsystem_in_path(cgp, "freezer");
 	std::string filename = cgp + std::string("freezer.state");
 
 	write_value_to_file(filename, "THAWED");
@@ -209,7 +209,7 @@ void cgroup_wait_frozen(const char *name) {
 	assert(strcmp(name, "") != 0);
 
 	auto cgp = cgroup_path(name);
-	replace_in_string(cgp, "freezer");
+	replace_subsystem_in_path(cgp, "freezer");
 	std::string filename = cgp + std::string("freezer.state");
 
 	std::string temp;
@@ -220,7 +220,7 @@ void cgroup_wait_frozen(const char *name) {
 
 void cgroup_wait_thawed(const char *name) {
 	auto cgp = cgroup_path(name);
-	replace_in_string(cgp, "freezer");
+	replace_subsystem_in_path(cgp, "freezer");
 	std::string filename = cgp + std::string("freezer.state");
 
 	std::string temp;
@@ -233,7 +233,7 @@ void cgroup_kill(const char *name) {
 	auto tids = get_tids_from_pid(getpid());
 
 	auto cgp = cgroup_path(name);
-	replace_in_string(cgp, "cpuset");
+	replace_subsystem_in_path(cgp, "cpuset");
 
 	// get all pids
 	std::vector<int> pids = read_lines_from_file<int>(cgp + std::string("tasks"));
@@ -438,7 +438,7 @@ static std::vector<int> get_tids_from_pid(const int pid) {
 	return ret;
 }
 
-static void replace_in_string(std::string &str, const std::string &to) {
+static void replace_subsystem_in_path(std::string &str, const std::string &to) {
 #ifdef SYSTEMD_SUPPORT
 	size_t start_pos = str.find(SUBSYSTEM_PLACEHOLDER);
 	assert(start_pos != std::string::npos);
