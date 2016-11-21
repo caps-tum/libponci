@@ -58,14 +58,6 @@ endif()
 ########
 
 ########
-# systemd support
-OPTION(BUILD_FOR_SYSTEMD "Support the systemd cgroup layout." ON)
-IF(BUILD_FOR_SYSTEMD)
-  ADD_DEFINITIONS(-DSYSTEMD_SUPPORT)
-ENDIF(BUILD_FOR_SYSTEMD)
-########
-
-########
 # Threads
 set(THREADS_PREFER_PTHREAD_FLAG ON)
 find_package(Threads REQUIRED)

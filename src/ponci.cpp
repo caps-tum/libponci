@@ -12,13 +12,13 @@
 #include "ponci/ponci.hpp"
 
 #include <algorithm>
-#include <array>
 #include <fstream>
 #include <functional>
 #include <iostream>
 #include <sstream>
 #include <stdexcept>
 #include <string>
+#include <vector>
 
 #include <cassert>
 #include <cerrno>
@@ -35,17 +35,11 @@
 // size of the buffers used to read from file
 static constexpr std::size_t buf_size = 255;
 
-#ifdef SYSTEMD_SUPPORT
-// list of all subsystems used ... again fancy construct to prevent exit-time destructor from being called
-static auto &subsystems = *new std::array<std::string, 2>{{"cpuset", "freezer"}};
-// placeholder to be substituted by the array entries below if operation is applied to
-// all subsystems
+// placeholder to be substituted by the names of a subsystem
 static const auto &SUBSYSTEM_PLACEHOLDER = *new std::string("%SUBSYSTEM%");
-#else
-// without systemd we mount everything in one directory
-static auto &subsystems = *new std::array<std::string, 1>{{""}};
-static const auto &SUBSYSTEM_PLACEHOLDER = *new std::string("");
-#endif
+
+// list of subsystems, updated in constructor
+static std::vector<std::string> *subsystems;
 
 /////////////////////////////////////////////////////////////////
 // PROTOTYPES
@@ -67,14 +61,17 @@ template <> inline int string_to_T<int>(const std::string &s, std::size_t &done)
 
 static std::vector<int> get_tids_from_pid(int pid);
 
+static bool check_is_systemd();
 static void replace_subsystem_in_path(std::string &str, const std::string &to);
+
+static void _constructor() __attribute__((constructor));
 
 /////////////////////////////////////////////////////////////////
 // EXPORTED FUNCTIONS
 /////////////////////////////////////////////////////////////////
 void cgroup_create(const char *name) {
 	const auto cgp = cgroup_path(name);
-	for (const auto &sub : subsystems) {
+	for (const auto &sub : *subsystems) {
 		auto temp = cgp;
 		replace_subsystem_in_path(temp, sub);
 		const int err = mkdir(temp.c_str(), S_IRWXU | S_IRWXG);
@@ -87,7 +84,7 @@ void cgroup_create(const char *name) {
 
 void cgroup_delete(const char *name) {
 	const auto cgp = cgroup_path(name);
-	for (const auto &sub : subsystems) {
+	for (const auto &sub : *subsystems) {
 		auto temp = cgp;
 		replace_subsystem_in_path(temp, sub);
 		const int err = rmdir(temp.c_str());
@@ -103,7 +100,7 @@ void cgroup_add_me(const char *name) {
 
 void cgroup_add_task(const char *name, const pid_t tid) {
 	const auto cgp = cgroup_path(name);
-	for (const auto &sub : subsystems) {
+	for (const auto &sub : *subsystems) {
 		auto temp = cgp;
 		replace_subsystem_in_path(temp, sub);
 
@@ -264,10 +261,9 @@ static inline std::string cgroup_path(const char *name) {
 
 	std::string res(env != nullptr ? std::string(env) : std::string("/sys/fs/cgroup/"));
 
-#ifdef SYSTEMD_SUPPORT
 	res.append(SUBSYSTEM_PLACEHOLDER);
 	res.append("/");
-#endif
+
 	if (strcmp(name, "") != 0) {
 		res.append(name);
 		res.append("/");
@@ -437,9 +433,51 @@ static std::vector<int> get_tids_from_pid(const int pid) {
 }
 
 static void replace_subsystem_in_path(std::string &str, const std::string &to) {
-#ifdef SYSTEMD_SUPPORT
 	size_t start_pos = str.find(SUBSYSTEM_PLACEHOLDER);
 	assert(start_pos != std::string::npos);
 	str.replace(start_pos, SUBSYSTEM_PLACEHOLDER.length(), to);
-#endif
+}
+
+// check if the system is using systemd
+static bool check_is_systemd() {
+	bool ret = false;
+
+	// read /etc/mtab and check if it contains
+	FILE *file = fopen("/etc/mtab", "r");
+
+	if (file == nullptr) {
+		throw std::runtime_error(strerror(errno));
+	}
+
+	char temp[buf_size];
+	while (true) {
+		if (fgets(temp, buf_size, file) == nullptr && !feof(file)) {
+			// something is wrong. let's try to close the file and go home
+			fclose(file);
+			throw std::runtime_error("Error while reading file in libponci. Buffer to small?");
+		}
+		if (feof(file)) break;
+		if (std::string(temp).find("cgroup /sys/fs/cgroup/systemd") != std::string::npos) {
+			ret = true;
+			break;
+		}
+	}
+
+	if (fclose(file) != 0) {
+		throw std::runtime_error(strerror(errno));
+	}
+
+	return ret;
+}
+
+void _constructor() {
+	bool is_systemd = check_is_systemd();
+
+	subsystems = new std::vector<std::string>;
+	if (is_systemd) {
+		subsystems->emplace_back("cpuset");
+		subsystems->emplace_back("freezer");
+	} else {
+		subsystems->emplace_back("");
+	}
 }
