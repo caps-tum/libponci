@@ -13,9 +13,6 @@
 
 #include <algorithm>
 #include <fstream>
-#include <functional>
-#include <iostream>
-#include <sstream>
 #include <stdexcept>
 #include <string>
 #include <vector>
@@ -24,12 +21,13 @@
 #include <cerrno>
 #include <csignal>
 #include <cstdio>
+#include <cstdlib>
 #include <cstring>
 
 #include <dirent.h>
 #include <sys/stat.h>
-#include <sys/syscall.h>
 #include <sys/types.h>
+#include <syscall.h>
 #include <unistd.h>
 
 // size of the buffers used to read from file
@@ -451,12 +449,12 @@ static bool check_is_systemd() {
 
 	char temp[buf_size];
 	while (true) {
-		if (fgets(temp, buf_size, file) == nullptr && !feof(file)) {
+		if (fgets(temp, buf_size, file) == nullptr && (feof(file) == 0)) {
 			// something is wrong. let's try to close the file and go home
 			fclose(file);
 			throw std::runtime_error("Error while reading file in libponci. Buffer to small?");
 		}
-		if (feof(file)) break;
+		if (feof(file) != 0) break;
 		if (std::string(temp).find("cgroup /sys/fs/cgroup/systemd") != std::string::npos) {
 			ret = true;
 			break;
