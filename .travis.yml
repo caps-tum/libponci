@@ -82,8 +82,7 @@ before_install:
 script:
   - mkdir build
   - cd build
-  - cmake -DCMAKE_CXX_COMPILER=$COMPILERCXX -DCMAKE_C_COMPILER=$COMPILERC -DCMAKE_INSTALL_PREFIX=/tmp/ ..
-  - if [ -n "$RUNCLANGTIDY" ]; then cmake -DCMAKE_EXPORT_COMPILE_COMMANDS=true ..; fi
+  - cmake -DCMAKE_CXX_COMPILER=$COMPILERCXX -DCMAKE_C_COMPILER=$COMPILERC -DCMAKE_EXPORT_COMPILE_COMMANDS=true -DCMAKE_INSTALL_PREFIX=/tmp/ ..
   - make
   - make install
   - cd ..
