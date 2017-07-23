@@ -276,7 +276,7 @@ template <typename T> static inline void write_vector_to_file(const std::string 
 
 template <typename T> static inline void write_array_to_file(const std::string &filename, T *arr, size_t size) {
 	assert(size > 0);
-	assert(filename.compare("") != 0);
+	assert(filename != "");
 
 	std::string str;
 	for (size_t i = 0; i < size; ++i) {
@@ -288,7 +288,7 @@ template <typename T> static inline void write_array_to_file(const std::string &
 }
 
 template <typename T> static inline void append_value_to_file(const std::string &filename, T val) {
-	assert(filename.compare("") != 0);
+	assert(filename != "");
 
 	FILE *f = fopen(filename.c_str(), "a+");
 	if (f == nullptr) {
@@ -313,7 +313,7 @@ template <typename T> static inline void write_value_to_file(const std::string &
 }
 
 template <> void write_value_to_file<const char *>(const std::string &filename, const char *val) {
-	assert(filename.compare("") != 0);
+	assert(filename != "");
 
 	FILE *file = fopen(filename.c_str(), "w+");
 
@@ -336,7 +336,7 @@ template <> void write_value_to_file<const char *>(const std::string &filename, 
 }
 
 static inline std::string read_line_from_file(const std::string &filename) {
-	assert(filename.compare("") != 0);
+	assert(filename != "");
 
 	FILE *file = fopen(filename.c_str(), "r");
 
@@ -363,7 +363,7 @@ static inline std::string read_line_from_file(const std::string &filename) {
 }
 
 template <typename T> static inline std::vector<T> read_lines_from_file(const std::string &filename) {
-	assert(filename.compare("") != 0);
+	assert(filename != "");
 
 	FILE *file = fopen(filename.c_str(), "r");
 
