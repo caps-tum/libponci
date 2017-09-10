@@ -38,7 +38,7 @@ inline void resgroup_add_me(const std::string &name) { resgroup_add_me(name.c_st
 inline void resgroup_add_task(const std::string &name, const pid_t tid) { resgroup_add_task(name.c_str(), tid); }
 
 void resgroup_set_cpus(const std::string &name, const std::vector<size_t> &cpus);
-void resgroup_set_schemata(const std::string &name, const std::vector<size_t> schematas);
+void resgroup_set_schemata(const std::string &name, const std::vector<size_t> &schematas);
 
 #endif /* end of the c++ only functions */
 

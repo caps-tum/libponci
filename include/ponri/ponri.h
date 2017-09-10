@@ -39,7 +39,7 @@ void resgroup_add_me(const char *name);
 /**
  * Adss a given thread to the ressource group
  */
-void resgroup_add_task(const char *name, const pid_t tid);
+void resgroup_add_task(const char *name, pid_t tid);
 
 /**
  * Sets the CPU mask of a ressource group

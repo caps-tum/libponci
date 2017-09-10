@@ -73,9 +73,9 @@ template <typename T> static inline void append_value_to_file(const std::string 
 }
 
 template <std::size_t N>
-static inline void write_bitset_to_file(const std::string &filename, const std::bitset<N> &bitset) {
+static inline void write_bitset_to_file(const std::string &filename, const std::bitset<N> &bits) {
 	static_assert(N < 65, "Maximum bitset size is currently 64");
-	auto val = bitset.to_ullong();
+	auto val = bits.to_ullong();
 	std::stringstream sstream;
 	sstream << std::hex << val;
 	std::string str(sstream.str());

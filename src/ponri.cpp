@@ -87,7 +87,7 @@ void resgroup_set_schemata(const char *name, const size_t *schematas, size_t siz
 	write_value_to_file(filename, content);
 }
 
-void resgroup_set_schemata(const std::string &name, const std::vector<size_t> schematas) {
+void resgroup_set_schemata(const std::string &name, const std::vector<size_t> &schematas) {
 	resgroup_set_schemata(name.c_str(), &schematas[0], schematas.size());
 }
 
