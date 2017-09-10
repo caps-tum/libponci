@@ -85,10 +85,11 @@ static inline void write_bitset_to_file(const std::string &filename, const std::
 template <typename T> static inline void write_value_to_file(const std::string &filename, T val) {
 	write_value_to_file(filename, std::to_string(val).c_str());
 }
+
 template <> inline void write_value_to_file(const std::string &filename, std::string val) {
 	write_value_to_file(filename, val.c_str());
 }
-#include <iostream>
+
 template <> void write_value_to_file<const char *>(const std::string &filename, const char *val) {
 	assert(filename != "");
 
