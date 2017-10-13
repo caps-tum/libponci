@@ -39,6 +39,8 @@ inline void resgroup_add_task(const std::string &name, const pid_t tid) { resgro
 
 void resgroup_set_cpus(const std::string &name, const std::vector<size_t> &cpus);
 void resgroup_set_schemata(const std::string &name, const std::vector<size_t> &schematas);
+std::bitset<64> create_minimal_bitset();
+std::bitset<64> increase_bitset(std::bitset<64> bits);
 
 #endif /* end of the c++ only functions */
 

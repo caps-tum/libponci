@@ -122,6 +122,24 @@ unsigned int get_num_closids() {
 	return static_cast<unsigned int>(std::stoi(line));
 }
 
+std::bitset<64> create_minimal_bitset() {
+	std::bitset<64> bits;
+	for (size_t i = 0; i < get_min_cbm_bits(); ++i) {
+		bits.set(i);
+	}
+	return bits;
+}
+
+std::bitset<64> increase_bitset(std::bitset<64> bits) {
+	for (size_t i = 0; i < bits.size(); ++i) {
+		if (!bits[i]) {
+			bits[i] = true;
+			break;
+		}
+	}
+	return bits;
+}
+
 /////////////////////////////////////////////////////////////////
 // INTERNAL FUNCTIONS
 /////////////////////////////////////////////////////////////////
