@@ -1,6 +1,6 @@
 # libponcri -- poor mans cgroup/resctrl interface
 
-[![Build Status](https://travis-ci.org/lrr-tum/libponci.svg?branch=master)](https://travis-ci.org/lrr-tum/libponci)
+[![Build Status](https://travis-ci.org/caps-tum/poncos.svg?branch=master)](https://travis-ci.org/caps-tum/poncos)
 
 libponci is an interface for Linux control groups (cgroups). It uses the cgroup file system and can only be used if the file system is mounted and accessible by the user. Its main design goal is simplicity. It is currently not feature complete.
 
